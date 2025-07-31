@@ -40,17 +40,23 @@ export default function SetSelector({ onSetSelect }: SetSelectorProps) {
           )
         setAllSets(allSetsData)
         
-        // Create default filtered sets (excluding art series, masterpiece, promo, and small sets)
+        // Create default filtered sets (excluding art series, masterpiece, promo, box sets, and small sets)
         const validSets = allSetsData.filter((set: MTGSet) => {
           const setNameLower = set.name.toLowerCase()
           
-          // Filter out art series by default
+          // Filter out sets with 10 or fewer cards
+          if (set.card_count <= 10) {
+            return false
+          }
+          
+          // Filter out art series and memorabilia
           if (set.set_type === 'memorabilia' || setNameLower.includes('art series')) {
             return false
           }
           
           // Filter out masterpiece series
-          if (setNameLower.includes('masterpiece') || setNameLower.includes('inventions') || setNameLower.includes('invocations')) {
+          if (setNameLower.includes('masterpiece') || setNameLower.includes('inventions') || 
+              setNameLower.includes('invocations') || setNameLower.includes('expeditions')) {
             return false
           }
           
@@ -59,8 +65,10 @@ export default function SetSelector({ onSetSelect }: SetSelectorProps) {
             return false
           }
           
-          // Filter out sets with 10 or fewer cards unless "Token" is in the name
-          if (set.card_count <= 10 && !setNameLower.includes('token')) {
+          // Filter out box sets and special compilations
+          if (set.set_type === 'box' || setNameLower.includes('box') || 
+              setNameLower.includes('anthology') || setNameLower.includes('collection') ||
+              setNameLower.includes('premium deck') || setNameLower.includes('from the vault')) {
             return false
           }
           
@@ -83,7 +91,8 @@ export default function SetSelector({ onSetSelect }: SetSelectorProps) {
     const searchLower = searchQuery.toLowerCase()
     
     // Determine which set pool to search from
-    const searchPool = (searchLower.includes('art') || searchLower.includes('masterpiece') || searchLower.includes('promo')) ? allSets : sets
+    const searchPool = (searchLower.includes('art') || searchLower.includes('masterpiece') || 
+                       searchLower.includes('promo') || searchLower.includes('box')) ? allSets : sets
     
     const filtered = searchPool.filter(set => {
       const matchesSearch = set.name.toLowerCase().includes(searchLower) ||
@@ -91,21 +100,26 @@ export default function SetSelector({ onSetSelect }: SetSelectorProps) {
       
       if (!matchesSearch) return false
       
-      // If searching in allSets (because "art", "masterpiece", or "promo" was in query), still apply filters
-      if (searchLower.includes('art') || searchLower.includes('masterpiece') || searchLower.includes('promo')) {
+      // If searching in allSets (because special keywords were in query), still apply basic filters
+      if (searchLower.includes('art') || searchLower.includes('masterpiece') || 
+          searchLower.includes('promo') || searchLower.includes('box')) {
         const setNameLower = set.name.toLowerCase()
         
-        // Filter out small sets unless "Token" is in the name
-        if (set.card_count <= 10 && !setNameLower.includes('token')) {
+        // Always filter out sets with 10 or fewer cards
+        if (set.card_count <= 10) {
           return false
         }
         
         // Only filter out other special sets if not specifically searching for them
-        if (!searchLower.includes('masterpiece') && !searchLower.includes('promo') && !searchLower.includes('art')) {
+        if (!searchLower.includes('masterpiece') && !searchLower.includes('promo') && 
+            !searchLower.includes('art') && !searchLower.includes('box')) {
           if (setNameLower.includes('masterpiece') || setNameLower.includes('inventions') || 
-              setNameLower.includes('invocations') || set.set_type === 'promo' || 
-              setNameLower.includes('promo') || set.set_type === 'memorabilia' || 
-              setNameLower.includes('art series')) {
+              setNameLower.includes('invocations') || setNameLower.includes('expeditions') ||
+              set.set_type === 'promo' || setNameLower.includes('promo') || 
+              set.set_type === 'memorabilia' || setNameLower.includes('art series') ||
+              set.set_type === 'box' || setNameLower.includes('box') ||
+              setNameLower.includes('anthology') || setNameLower.includes('collection') ||
+              setNameLower.includes('premium deck') || setNameLower.includes('from the vault')) {
             return false
           }
         }
@@ -126,6 +140,7 @@ export default function SetSelector({ onSetSelect }: SetSelectorProps) {
       case 'commander': return 'bg-red-100 text-red-800'
       case 'memorabilia': return 'bg-pink-100 text-pink-800'
       case 'promo': return 'bg-yellow-100 text-yellow-800'
+      case 'box': return 'bg-indigo-100 text-indigo-800'
       default: return 'bg-gray-100 text-gray-800'
     }
   }
@@ -203,8 +218,8 @@ export default function SetSelector({ onSetSelect }: SetSelectorProps) {
       </ScrollArea>
       
       <p className="text-xs text-muted-foreground text-center">
-        Showing {filteredSets.length} of {(searchQuery.toLowerCase().includes('art') || searchQuery.toLowerCase().includes('masterpiece') || searchQuery.toLowerCase().includes('promo')) ? allSets.length : sets.length} available sets
-        {(searchQuery.toLowerCase().includes('art') || searchQuery.toLowerCase().includes('masterpiece') || searchQuery.toLowerCase().includes('promo')) && (
+        Showing {filteredSets.length} of {(searchQuery.toLowerCase().includes('art') || searchQuery.toLowerCase().includes('masterpiece') || searchQuery.toLowerCase().includes('promo') || searchQuery.toLowerCase().includes('box')) ? allSets.length : sets.length} available sets
+        {(searchQuery.toLowerCase().includes('art') || searchQuery.toLowerCase().includes('masterpiece') || searchQuery.toLowerCase().includes('promo') || searchQuery.toLowerCase().includes('box')) && (
           <span className="ml-2 text-accent">• Including special series in search</span>
         )}
       </p>
