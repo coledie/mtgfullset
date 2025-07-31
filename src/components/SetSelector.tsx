@@ -54,9 +54,13 @@ export default function SetSelector({ onSetSelect }: SetSelectorProps) {
             return false
           }
           
-          // Filter out masterpiece series
-          if (setNameLower.includes('masterpiece') || setNameLower.includes('inventions') || 
-              setNameLower.includes('invocations') || setNameLower.includes('expeditions')) {
+          // Filter out masterpiece series and special releases
+          if (setNameLower.includes('masterpiece') || setNameLower.includes('invention') || 
+              setNameLower.includes('invocation') || setNameLower.includes('expedition') ||
+              setNameLower.includes('showcase') || setNameLower.includes('timeshifted') ||
+              setNameLower.includes('mythic edition') || setNameLower.includes('special guest') ||
+              setNameLower.includes('list') || setNameLower.includes('secret lair') ||
+              set.set_type === 'masterpiece') {
             return false
           }
           
@@ -113,9 +117,12 @@ export default function SetSelector({ onSetSelect }: SetSelectorProps) {
         // Only filter out other special sets if not specifically searching for them
         if (!searchLower.includes('masterpiece') && !searchLower.includes('promo') && 
             !searchLower.includes('art') && !searchLower.includes('box')) {
-          if (setNameLower.includes('masterpiece') || setNameLower.includes('inventions') || 
-              setNameLower.includes('invocations') || setNameLower.includes('expeditions') ||
-              set.set_type === 'promo' || setNameLower.includes('promo') || 
+          if (setNameLower.includes('masterpiece') || setNameLower.includes('invention') || 
+              setNameLower.includes('invocation') || setNameLower.includes('expedition') ||
+              setNameLower.includes('showcase') || setNameLower.includes('timeshifted') ||
+              setNameLower.includes('mythic edition') || setNameLower.includes('special guest') ||
+              setNameLower.includes('list') || setNameLower.includes('secret lair') ||
+              set.set_type === 'masterpiece' || set.set_type === 'promo' || setNameLower.includes('promo') || 
               set.set_type === 'memorabilia' || setNameLower.includes('art series') ||
               set.set_type === 'box' || setNameLower.includes('box') ||
               setNameLower.includes('anthology') || setNameLower.includes('collection') ||
